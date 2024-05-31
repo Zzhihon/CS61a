@@ -1,6 +1,6 @@
 """The Game of Hog."""
 
-from dice import six_sided, make_test_dice
+from dice import six_sided, make_test_dice,four_sided
 from ucb import main, trace, interact
 
 GOAL = 100  # The goal of Hog is to score 100 points.
@@ -10,7 +10,7 @@ GOAL = 100  # The goal of Hog is to score 100 points.
 ######################
 
 
-def roll_dice(num_rolls, dice=six_sided):
+def roll_dice(num_rolls, dicee=six_sided):
     """Simulate rolling the DICE exactly NUM_ROLLS > 0 times. Return the sum of
     the outcomes unless any of the outcomes is 1. In that case, return 1.
 
@@ -26,7 +26,7 @@ def roll_dice(num_rolls, dice=six_sided):
     times = 0
     flag = False
     while(times < num_rolls):
-        result = dice()
+        result = dicee()
         if result == 1:
             flag = True
         else:
@@ -202,6 +202,10 @@ def always_roll(n):
     assert n >= 0 and n <= 10
     # BEGIN PROBLEM 6
     "*** YOUR CODE HERE ***"
+    def strategy(score0,score1):
+        return n
+    return strategy
+    
     # END PROBLEM 6
 
 
@@ -233,8 +237,19 @@ def is_always_roll(strategy, goal=GOAL):
     """
     # BEGIN PROBLEM 7
     "*** YOUR CODE HERE ***"
+    always_roll_same = True
+    score0, score1 = 0, 0
+    strategy_init = strategy(score0,score1)
+    while score0 < goal:
+        score1 = 0
+        while score1 < goal:
+            if strategy(score0,score1) != strategy_init:
+                always_roll_same = False
+            score1 += 1
+        
+        score0 += 1
     # END PROBLEM 7
-
+    return always_roll_same
 
 def make_averaged(original_function, samples_count=1000):
     """Return a function that returns the average value of ORIGINAL_FUNCTION
@@ -249,6 +264,15 @@ def make_averaged(original_function, samples_count=1000):
     """
     # BEGIN PROBLEM 8
     "*** YOUR CODE HERE ***"
+    def make_averaged_funtion(*args):
+        cnt = 0
+        sum = 0
+        while cnt < samples_count:
+            sum += original_function(*args)
+            cnt += 1
+        res = sum/samples_count
+        return res
+    return make_averaged_funtion
     # END PROBLEM 8
 
 
@@ -263,6 +287,15 @@ def max_scoring_num_rolls(dice=six_sided, samples_count=1000):
     """
     # BEGIN PROBLEM 9
     "*** YOUR CODE HERE ***"
+    max_average = 0
+    for i in range(1,11):
+        average_roll_dice = make_averaged(roll_dice, samples_count)
+        res = average_roll_dice(i,dice)
+        if res > max_average:
+            ans = i
+            max_average = res
+    
+    return ans
     # END PROBLEM 9
 
 
@@ -307,6 +340,9 @@ def boar_strategy(score, opponent_score, threshold=11, num_rolls=6):
     points, and returns NUM_ROLLS otherwise. Ignore score and Sus Fuss.
     """
     # BEGIN PROBLEM 10
+    res = boar_brawl(score,opponent_score)
+    if res >= threshold:
+        num_rolls = 0
     return num_rolls  # Remove this line once implemented.
     # END PROBLEM 10
 
@@ -314,6 +350,9 @@ def boar_strategy(score, opponent_score, threshold=11, num_rolls=6):
 def sus_strategy(score, opponent_score, threshold=11, num_rolls=6):
     """This strategy returns 0 dice when your score would increase by at least threshold."""
     # BEGIN PROBLEM 11
+    res = sus_points(score+boar_brawl(score,opponent_score))
+    if res-score >= threshold:
+        num_rolls = 0
     return num_rolls  # Remove this line once implemented.
     # END PROBLEM 11
 
