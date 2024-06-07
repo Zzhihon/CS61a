@@ -34,6 +34,9 @@ def scheme_eval(expr, env, _=None): # Optional third argument is ignored
     else:
         # BEGIN PROBLEM 3
         "*** YOUR CODE HERE ***"
+        procedure = scheme_eval(first, env)
+        args = rest.map(lambda operand: scheme_eval(operand, env))
+        return scheme_apply(procedure, args, env)
         # END PROBLEM 3
 
 def scheme_apply(procedure, args, env):
@@ -45,20 +48,31 @@ def scheme_apply(procedure, args, env):
     if isinstance(procedure, BuiltinProcedure):
         # BEGIN PROBLEM 2
         "*** YOUR CODE HERE ***"
+        link_list = []
+        while args != nil:
+            link_list.append(args.first)
+            args = args.rest
+        if procedure.need_env == True:
+            link_list.append(env)
         # END PROBLEM 2
         try:
             # BEGIN PROBLEM 2
             "*** YOUR CODE HERE ***"
+            return procedure.py_func(*link_list)
             # END PROBLEM 2
         except TypeError as err:
             raise SchemeError('incorrect number of arguments: {0}'.format(procedure))
     elif isinstance(procedure, LambdaProcedure):
         # BEGIN PROBLEM 9
         "*** YOUR CODE HERE ***"
+        child_frame = procedure.env.make_child_frame(procedure.formals, args)
+        return eval_all(procedure.body, child_frame)
         # END PROBLEM 9
     elif isinstance(procedure, MuProcedure):
         # BEGIN PROBLEM 11
         "*** YOUR CODE HERE ***"
+        child_frame = env.make_child_frame(procedure.formals, args)
+        return eval_all(procedure.body, child_frame)
         # END PROBLEM 11
     else:
         assert False, "Unexpected procedure: {}".format(procedure)
@@ -71,7 +85,7 @@ def eval_all(expressions, env):
     1
     >>> eval_all(read_line("(1 2)"), create_global_frame())
     2
-    >>> x = eval_all(read_line("((print 1) 2)"), create_global_frame())
+    >>> x =   eval_all(read_line("((print 1) 2)"), create_global_frame())
     1
     >>> x
     2
@@ -79,6 +93,11 @@ def eval_all(expressions, env):
     2
     """
     # BEGIN PROBLEM 6
+    if expressions == nil:
+        return None
+    while expressions.rest != nil:
+        scheme_eval(expressions.first, env)
+        expressions = expressions.rest
     return scheme_eval(expressions.first, env) # replace this with lines of your own code
     # END PROBLEM 6
 

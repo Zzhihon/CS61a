@@ -15,7 +15,7 @@ from scheme_builtins import *
 def do_define_form(expressions, env):
     """Evaluate a define form.
     >>> env = create_global_frame()
-    >>> do_define_form(read_line("(x 2)"), env) # evaluating (define x 2)
+    >>> do_define_form(scheme_eval(read_line("(f 1 2)"), env)scheme_eval(read_line("(f 1 2)"), env)scheme_eval(read_line("(f 1 2)"), env)scheme_eval(read_line("(f 1 2)"), env)("(x 2)"), env) # evaluating (define x 2)
     'x'
     >>> scheme_eval("x", env)
     2
@@ -37,11 +37,22 @@ def do_define_form(expressions, env):
         validate_form(expressions, 2, 2) # Checks that expressions is a list of length exactly 2
         # BEGIN PROBLEM 4
         "*** YOUR CODE HERE ***"
+        value = scheme_eval(expressions.rest.first, env)
+        ###将计算出来的函数值bind到signature（也就是函数的变量名）
+        env.define(signature, value)
+        return signature
         # END PROBLEM 4
     elif isinstance(signature, Pair) and scheme_symbolp(signature.first):
         # defining a named procedure e.g. (define (f x y) (+ x y))
         # BEGIN PROBLEM 10
         "*** YOUR CODE HERE ***"
+        formals = signature.rest
+        expressions_nosymbol = Pair(formals,expressions.rest)
+        value = do_lambda_form(expressions_nosymbol, env)
+        env.define(signature.first, value)
+        return signature.first
+
+
         # END PROBLEM 10
     else:
         bad_signature = signature.first if isinstance(signature, Pair) else signature
@@ -57,6 +68,7 @@ def do_quote_form(expressions, env):
     validate_form(expressions, 1, 1)
     # BEGIN PROBLEM 5
     "*** YOUR CODE HERE ***"
+    return expressions.first
     # END PROBLEM 5
 
 def do_begin_form(expressions, env):
@@ -83,6 +95,8 @@ def do_lambda_form(expressions, env):
     validate_formals(formals)
     # BEGIN PROBLEM 7
     "*** YOUR CODE HERE ***"
+    body = expressions.rest
+    return LambdaProcedure(formals, body, env)
     # END PROBLEM 7
 
 def do_if_form(expressions, env):
@@ -116,6 +130,17 @@ def do_and_form(expressions, env):
     """
     # BEGIN PROBLEM 12
     "*** YOUR CODE HERE ***"
+    if expressions == nil:
+        return True
+    while expressions != nil:
+        if expressions.rest == nil:
+            return scheme_eval(expressions.first, env)
+        else:
+            value = scheme_eval(expressions.first, env)
+        if is_scheme_false(value):
+            return False
+        
+        expressions = expressions.rest
     # END PROBLEM 12
 
 def do_or_form(expressions, env):
@@ -134,6 +159,19 @@ def do_or_form(expressions, env):
     """
     # BEGIN PROBLEM 12
     "*** YOUR CODE HERE ***"
+    if expressions == nil:
+        return False
+    while expressions != nil:
+        if expressions.rest == nil:
+            return scheme_eval(expressions.first, env)
+        else:
+            value = scheme_eval(expressions.first, env)
+        if is_scheme_true(value):
+            return value
+        expressions = expressions.rest
+
+ 
+    return expressions.rest.first
     # END PROBLEM 12
 
 def do_cond_form(expressions, env):
@@ -154,6 +192,10 @@ def do_cond_form(expressions, env):
         if is_scheme_true(test):
             # BEGIN PROBLEM 13
             "*** YOUR CODE HERE ***"
+            if clause.rest is nil:
+                return test
+            else:
+                return eval_all(clause.rest,env)
             # END PROBLEM 13
         expressions = expressions.rest
 
@@ -220,6 +262,8 @@ def do_mu_form(expressions, env):
     validate_formals(formals)
     # BEGIN PROBLEM 11
     "*** YOUR CODE HERE ***"
+    body = expressions.rest
+    return MuProcedure(formals, body)
     # END PROBLEM 11
 
 
