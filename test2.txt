@@ -1,0 +1,1 @@
+添加完test2后不进行commit,看一下test2会不会同步到main分支上（main分支上没有test2）
