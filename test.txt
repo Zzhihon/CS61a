@@ -1,2 +1,2 @@
-在main分支创建test.txt并commit后，切换·到main_branch分支上，看看是否能修改已经commit的文件
+main分支创建test.txt并commit后，切换·到main_branch分支上，看看是否能修改已经commit的文件
 从前的测试看，如果main分支commit的话，切换到分支后仍然可以更改并直接切换为main(不会报错)
